@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tmp {
+namespace MathEval {
     class Program {
         static void Main(string[] args) {
             string x = Console.ReadLine();
@@ -15,10 +15,9 @@ namespace Tmp {
         
         // Function to evaluate maths
         public static float EvalMath(string s) {
-        
             while (s.Contains('(')) { // Evaluate the contence of any brackets and then replace them
                     // Remove the brackets from the string                                               And replace with the evaluation of said brackets
-                s = s.Remove(s.IndexOf('('), s.IndexOf(')') - s.IndexOf('(') + 1).Insert(s.IndexOf('('), EvalMath(s.Substring(s.IndexOf('(') + 1, s.IndexOf(')') - s.IndexOf('(') - 1)).ToString());
+                s = s.Remove(s.IndexOf('('), s.LastIndexOf(')') - s.IndexOf('(') + 1).Insert(s.IndexOf('('), EvalMath(s.Substring(s.IndexOf('(') + 1, s.LastIndexOf(')') - s.IndexOf('(') - 1)).ToString());
             }
             
             // split the string into numbers and symbols for doing maths
