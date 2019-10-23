@@ -22,7 +22,7 @@ namespace Tmp {
             }
             
             // split the string into numbers and symbols for doing maths
-            string[] x = Regex.Split(s, @"([x()\^\/]|(?<!E)[\+\-])");
+            string[] x = Regex.Split(s, @"([x\^\/]|(?<!E)[\+\-])");
             
             // convert that into a list so we can use some cool functions
             List<string> parts = x.ToList();
