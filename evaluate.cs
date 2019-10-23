@@ -8,60 +8,80 @@ using System.Linq;
 namespace MathEval {
     class Program {
         static void Main(string[] args) {
-            string x = Console.ReadLine();
-            Console.WriteLine(EvalMath(x));
+            string sum = Console.ReadLine();
+            Console.WriteLine(EvalMath(sum));
         }
         
         
         // Function to evaluate maths
         public static float EvalMath(string strExp) {
-            while (strExp.Contains('(')) { // Evaluate the contence of any brackets and then replace them
-                    // Remove the brackets from the string                                               And replace with the evaluation of said brackets
-                strExp = strExp.Remove(strExp.IndexOf('('), strExp.LastIndexOf(')') - strExp.IndexOf('(') + 1).Insert(strExp.IndexOf('('), EvalMath(strExp.Substring(strExp.IndexOf('(') + 1, strExp.LastIndexOf(')') - strExp.IndexOf('(') - 1)).ToString());
+
+            // Function to carry out operations
+            float MathDis(string symbol, float x, float y) {
+                switch (symbol) {// Easy implementation of bidmas
+                    case "^": return (float)Math.Pow(x, y);
+                    case "/": return x / y;
+                    case "x": return x * y;
+                    case "*": return x * y;
+                    case "+": return x + y;
+                    case "-": return x - y;
+                    default: throw new Exception("invalid logic");
+                }
+            }
+
+            // Evaluate the contence of any brackets and then replace them
+            while (strExp.Contains('(')) { 
+                // Remove the brackets from the string
+                strExp = strExp.Remove(
+                            strExp.IndexOf('('),
+                            strExp.LastIndexOf(')') - strExp.IndexOf('(') + 1
+                            ).Insert(   // And replace with the evaluation of said brackets
+                                strExp.IndexOf('('), 
+                                // Evaluation of said brackets
+                                EvalMath(
+                                    strExp.Substring(
+                                        strExp.IndexOf('(') + 1,
+                                        strExp.LastIndexOf(')') - strExp.IndexOf('(') - 1
+                                    )
+                                ).ToString()
+                            );
             }
             
-            // split the string into numbers and symbols for doing maths
-            string[] x = Regex.Split(strExp, @"([x*\^\/]|(?<!E)[\+\-])");
-            
+            // split the string into numbers and symbols for doing maths and 
             // convert that into a list so we can use some cool functions
-            List<string> parts = x.ToList();
+            List<string> parts = (Regex.Split(strExp, @"([x*\^\/]|(?<!E)[\+\-])")).ToList();
 
             int i = 0;
+            string opcode = " ";
+
             // For every element untill there is only one element left that would have to contain the answer
             while (i < parts.Count) { 
-                
-                // if the element is any operator (could use !float.TryParse instead probs)
-                if (parts[i] == "^" || parts[i] == "/" || parts[i] == "x" || parts[i] == "+" || parts[i] == "-" || parts[i] == "*") {
-                    
+                // Determine if parts[i] is an operator and if so order by bidmas
+                if (parts[i] == "-") { opcode = parts[i];
+                } else if (parts[i] == "+") { opcode = parts[i];
+                } else if (parts[i] == "*") { opcode = parts[i];
+                } else if (parts[i] == "x") { opcode = parts[i];
+                } else if (parts[i] == "/") { opcode = parts[i];
+                } else if (parts[i] == "^") { opcode = parts[i];
+                }
+                i++;
+                if( !opcode.Contains(" ") && i == parts.Count-1) {
+                    i = parts.LastIndexOf(opcode);
                     // Replace that element (operater) with the result of the calculation using the numbers either side of it
                     parts[i] = MathDis(parts[i], float.Parse(parts[i - 1]), float.Parse(parts[i + 1])).ToString();
-                    
+
                     // Remove the prior and latter elements that contained the numbers
                     parts.RemoveAt(i - 1);
                     parts.RemoveAt(i);
-                    
-                    // Restart from first element
+
                     i = 0;
-                // Otherwise move on to the next element
-                } else { i++; }
+                    // Otherwise move on to the next element
             }
+            }
+
             
             // Return the only remaining element of "parts" which must be the result
-            return float.Parse(string.Join("", parts.ToArray()));
-        }
-        
-        // Function to carry out operations
-        public static float MathDis(string oprand, float x, float y) {
-            switch (oprand) {
-                    // Easy implementation of bidmas
-                case "^": return (float)Math.Pow(x, y);
-                case "/": return x / y;
-                case "x": return x * y;
-                case "*": return x * y;
-                case "+": return x + y;
-                case "-": return x - y;
-                default: throw new Exception("invalid logic");
-            }
+            return float.Parse(parts[0]);
         }
     }
 }
