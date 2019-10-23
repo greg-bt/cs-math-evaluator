@@ -53,19 +53,22 @@ namespace MathEval {
 
             int i = 0;
             string opcode = " ";
+            int weight = 0;
 
             // For every element untill there is only one element left that would have to contain the answer
             while (i < parts.Count) { 
-                // Determine if parts[i] is an operator and if so order by bidmas
-                if (parts[i] == "-") { opcode = parts[i];
-                } else if (parts[i] == "+") { opcode = parts[i];
-                } else if (parts[i] == "*") { opcode = parts[i];
-                } else if (parts[i] == "x") { opcode = parts[i];
-                } else if (parts[i] == "/") { opcode = parts[i];
-                } else if (parts[i] == "^") { opcode = parts[i];
-                }
+
+                // Determine if parts[i] is an operator and if so order by bidmas ( weight )
+                       if (parts[i] == "-" && weight <2) { opcode = parts[i]; weight = 1;
+                } else if (parts[i] == "+" && weight <3) { opcode = parts[i]; weight = 2;
+                } else if (parts[i] == "*" && weight <4) { opcode = parts[i]; weight = 3;
+                } else if (parts[i] == "x" && weight <5) { opcode = parts[i]; weight = 4;
+                } else if (parts[i] == "/" && weight <6) { opcode = parts[i]; weight = 5;
+                } else if (parts[i] == "^" && weight <7) { opcode = parts[i]; weight = 6; }
                 i++;
-                if( !opcode.Contains(" ") && i == parts.Count-1) {
+
+                // Once all posible operators have been checked
+                if( weight != 0 && i == parts.Count-1) {
                     i = parts.LastIndexOf(opcode);
                     // Replace that element (operater) with the result of the calculation using the numbers either side of it
                     parts[i] = MathDis(parts[i], float.Parse(parts[i - 1]), float.Parse(parts[i + 1])).ToString();
@@ -75,11 +78,10 @@ namespace MathEval {
                     parts.RemoveAt(i);
 
                     i = 0;
+                    weight = 0;
                     // Otherwise move on to the next element
+                }
             }
-            }
-
-            
             // Return the only remaining element of "parts" which must be the result
             return float.Parse(parts[0]);
         }
