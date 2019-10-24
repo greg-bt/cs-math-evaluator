@@ -1,16 +1,19 @@
 # cs-math-evaluator
-A simple c# function capable of evaluating a mathematical operation which is given in the form of a string, such as "(5+6)x(3/9)".<br>
-The EvalMath function takes one argument in the form of a string and returns the result as a float.<br>
-The string should be sanitised before being passed into the function as it will result in an error otherwise.<br>
+A simple c# function capable of evaluating a mathematical operation which is given in the form of a string, such as "(5+6)x(3/9)".
+
+The EvalMath function takes one argument in the form of a string and returns the result as a float.
+
+The string should be sanitised before being passed into the function as it will result in an error otherwise.
+
 Requires:
 ```
 System.Text.RegularExpressions;
 System.Collections.Generic;
 System.Linq;
 ```
-<br>
+
 # EvalMath Function
-<br>
+
 ```
 // Function to evaluate maths in string form
 public static float EvalMath(string strExp) {
@@ -88,4 +91,5 @@ public static float EvalMath(string strExp) {
     // Return the only remaining element of "mathExp" which must be the result
     return float.Parse(mathExp[0]);
 }
+
 ```
