@@ -10,7 +10,8 @@ System.Linq;
 ```
 <br>
 # EvalMath Function
-```cs
+<br>
+```
 // Function to evaluate maths in string form
 public static float EvalMath(string strExp) {
 
