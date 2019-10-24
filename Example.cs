@@ -8,7 +8,7 @@ using System.Linq;
 namespace MathEval {
     class Program {
         static void Main(string[] args) {
-            string sum = Console.ReadLine();
+            string sum = Console.ReadLine(); // take user input
             Console.WriteLine(EvalMath(sum));
         }
         
