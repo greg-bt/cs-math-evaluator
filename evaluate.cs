@@ -12,13 +12,12 @@ namespace MathEval {
             Console.WriteLine(EvalMath(sum));
         }
         
-        
-        // Function to evaluate maths
+        // Function to evaluate maths in string form
         public static float EvalMath(string strExp) {
 
-            // Function to carry out operations
-            float MathDis(string symbol, float x, float y) {
-                switch (symbol) {// Easy implementation of bidmas
+            // Local function that carries out most simplified operations
+            float MathDis(string sign, float x, float y) {
+                switch (sign) {
                     case "^": return (float)Math.Pow(x, y);
                     case "/": return x / y;
                     case "x": return x * y;
@@ -29,61 +28,66 @@ namespace MathEval {
                 }
             }
 
-            // Evaluate the contence of any brackets and then replace them
+            // Solve the contense of any brackets and then replace them with the result
             while (strExp.Contains('(')) { 
-                // Remove the brackets from the string
+                // Remove the bracketed expressions from the string
                 strExp = strExp.Remove(
-                            strExp.IndexOf('('),
-                            strExp.LastIndexOf(')') - strExp.IndexOf('(') + 1
-                            ).Insert(   // And replace with the evaluation of said brackets
+                            strExp.IndexOf('('),                              // Start of the expression
+                            strExp.LastIndexOf(')') - strExp.IndexOf('(') + 1 // End of the expression
+                // And replace them with the solved bracketed expression
+                            ).Insert( 
                                 strExp.IndexOf('('), 
-                                // Evaluation of said brackets
+                // Solve said bracketed expressions by calling EvalMath
                                 EvalMath(
-                                    strExp.Substring(
-                                        strExp.IndexOf('(') + 1,
-                                        strExp.LastIndexOf(')') - strExp.IndexOf('(') - 1
-                                    )
-                                ).ToString()
-                            );
+                                    strExp.Substring( // Extract the expression from the brackets
+                                        strExp.IndexOf('(') + 1,                           // Start of the expression
+                                        strExp.LastIndexOf(')') - strExp.IndexOf('(') - 1  // End of the expression
+                                    )).ToString());
             }
             
-            // split the string into numbers and symbols for doing maths and 
-            // convert that into a list so we can use some cool functions
-            List<string> parts = (Regex.Split(strExp, @"([x*\^\/]|(?<!E)[\+\-])")).ToList();
+            // Split the string Expression into a Array of numbers and symbols
+            // Then convert that into a list for ease of use
+            List<string> mathExp = (Regex.Split(strExp, @"([x*\^\/]|(?<!E)[\+\-])")).ToList();
 
+            string[] signs = {"-","+","*","x","/","^"}; // Weight is indicated by a sign's index
+            string opcode = " "; // The operator going to be used
+            int weight = 0; // Denotes how early on a particular sign comes in bidmas
             int i = 0;
-            string opcode = " ";
-            int weight = 0;
 
-            // For every element untill there is only one element left that would have to contain the answer
-            while (i < parts.Count) { 
+            // When only one element exists it must be the answer
+            while (i < mathExp.Count) { 
 
-                // Determine if parts[i] is an operator and if so order by bidmas ( weight )
-                       if (parts[i] == "-" && weight <2) { opcode = parts[i]; weight = 1;
-                } else if (parts[i] == "+" && weight <3) { opcode = parts[i]; weight = 2;
-                } else if (parts[i] == "*" && weight <4) { opcode = parts[i]; weight = 3;
-                } else if (parts[i] == "x" && weight <5) { opcode = parts[i]; weight = 4;
-                } else if (parts[i] == "/" && weight <6) { opcode = parts[i]; weight = 5;
-                } else if (parts[i] == "^" && weight <7) { opcode = parts[i]; weight = 6; }
+                // Determine if mathExp[i] is a sign
+                for (int j =0;j < 6;j++) {
+                    // Determine if the sign comes before the others in bidmas
+                    if(mathExp[i] == signs[j] && weight < j) {
+                        opcode = mathExp[i]; // Update the to earliest sign found so far
+                        weight = i; // Update to the greatest weight found so far
+                    }
+                }
                 i++;
 
                 // Once all posible operators have been checked
-                if( weight != 0 && i == parts.Count-1) {
-                    i = parts.LastIndexOf(opcode);
-                    // Replace that element (operater) with the result of the calculation using the numbers either side of it
-                    parts[i] = MathDis(parts[i], float.Parse(parts[i - 1]), float.Parse(parts[i + 1])).ToString();
+                if( weight != 0 && i == mathExp.Count-1) {
+                    i = mathExp.LastIndexOf(opcode); // Using the earliest bidmas sign found . . 
+                    // Replace that sign with the result of the calculation using the numbers either side of it
+                    mathExp[i] = MathDis(mathExp[i],                  // The sign
+                                         float.Parse(mathExp[i - 1]), // First number
+                                         float.Parse(mathExp[i + 1])  // Second number
+                                        ).ToString();
 
                     // Remove the prior and latter elements that contained the numbers
-                    parts.RemoveAt(i - 1);
-                    parts.RemoveAt(i);
+                    // so that only the result is returned to the list
+                    mathExp.RemoveAt(i - 1); // prior
+                    mathExp.RemoveAt(i);     // latter
 
                     i = 0;
                     weight = 0;
-                    // Otherwise move on to the next element
+                    // Otherwise move on to the next element because it isn't a sign
                 }
             }
-            // Return the only remaining element of "parts" which must be the result
-            return float.Parse(parts[0]);
+            // Return the only remaining element of "mathExp" which must be the result
+            return float.Parse(mathExp[0]);
         }
     }
 }
