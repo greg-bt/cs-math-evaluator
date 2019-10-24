@@ -14,7 +14,7 @@ System.Linq;
 
 # EvalMath Function
 
-```
+```cs
 // Function to evaluate maths in string form
 public static float EvalMath(string strExp) {
 
