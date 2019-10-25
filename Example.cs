@@ -8,7 +8,8 @@ using System.Linq;
 namespace MathEval {
     class Program {
         static void Main(string[] args) {
-            string sum = Console.ReadLine(); // take user input
+            System.Console.WriteLine("Sum:");
+            string sum = Console.ReadLine();
             Console.WriteLine(EvalMath(sum));
         }
         
@@ -24,7 +25,7 @@ namespace MathEval {
                     case "*": return x * y;
                     case "+": return x + y;
                     case "-": return x - y;
-                    default: throw new Exception("invalid logic");
+                    default: return 0;
                 }
             }
 
@@ -49,43 +50,23 @@ namespace MathEval {
             // Then convert that into a list for ease of use
             List<string> mathExp = (Regex.Split(strExp, @"([x*\^\/]|(?<!E)[\+\-])")).ToList();
 
-            string[] signs = {"-","+","*","x","/","^"}; // Weight is indicated by a sign's index
-            string opcode = " "; // The operator going to be used
-            int weight = 0; // Denotes how early on a particular sign comes in bidmas
+            string[] signs = {"^","/","x","*","+","-"}; // Bidmas
             int i = 0;
 
-            // When only one element exists it must be the answer
-            while (i < mathExp.Count) { 
-
-                // Determine if mathExp[i] is a sign
-                for (int j =0;j < 6;j++) {
-                    // Determine if the sign comes before the others in bidmas
-                    if(mathExp[i] == signs[j] && weight < j) {
-                        opcode = mathExp[i]; // Update the to earliest sign found so far
-                        weight = i; // Update to the greatest weight found so far
-                    }
-                }
-                i++;
-
-                // Once all posible operators have been checked
-                if( weight != 0 && i == mathExp.Count-1) {
-                    i = mathExp.LastIndexOf(opcode); // Using the earliest bidmas sign found . . 
-                    // Replace that sign with the result of the calculation using the numbers either side of it
-                    mathExp[i] = MathDis(mathExp[i],                  // The sign
+            foreach (string sign in signs) {
+                while (mathExp.Contains(sign)) {
+                    i = mathExp.IndexOf(sign);
+                                        // Replace that sign with the result of the calculation using the numbers either side of it
+                    mathExp[i-1] = MathDis(mathExp[i],          // The sign
                                          float.Parse(mathExp[i - 1]), // First number
                                          float.Parse(mathExp[i + 1])  // Second number
                                         ).ToString();
-
-                    // Remove the prior and latter elements that contained the numbers
-                    // so that only the result is returned to the list
-                    mathExp.RemoveAt(i - 1); // prior
-                    mathExp.RemoveAt(i);     // latter
-
-                    i = 0;
-                    weight = 0;
-                    // Otherwise move on to the next element because it isn't a sign
+                        // Remove the prior and latter elements that contained the numbers
+                        // so that only the result is returned to the list
+                        mathExp.RemoveRange(i, i+1);
                 }
             }
+            // When only one element exists it must be the answer
             // Return the only remaining element of "mathExp" which must be the result
             return float.Parse(mathExp[0]);
         }
