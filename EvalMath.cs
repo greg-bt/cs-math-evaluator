@@ -46,8 +46,8 @@ public static float EvalMath(string strExp) {
     }
         
     if ( mathExp.Count == 2 ) {
-        mathExp[0] = float.Parse(mathExp[0]) * float.Parse(mathExp[1]);
-        mathExp.Remove(1);
+        mathExp[0] = (float.Parse(mathExp[0]) * float.Parse(mathExp[1])).ToString();
+        mathExp.RemoveAt(1);
     }
             
     // When only one element exists it must be the answer
